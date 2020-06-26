@@ -1,13 +1,17 @@
 const durationInput = document.querySelector('#duration');
 const startButton = document.querySelector('#start');
 const pauseButton = document.querySelector('#pause');
+const circle = document.querySelector('#timer-circle');
+const perimeter = 2 * Math.PI * circle.getAttribute('r');
 
+let duration;
 const timer = new Timer(durationInput, startButton, pauseButton, {
-  onStart() {
+  onStart(totalDuration) {
     console.log('Timer started');
+    duration = totalDuration;
   },
-  onTick() {
-    console.log('Tick');
+  onTick(timeRemaining) {
+    circle.setAttribute('stroke-dashoffset', perimeter * timeRemaining / duration - perimeter);
   },
   onComplete() {
     console.log('Done!');
@@ -15,16 +19,14 @@ const timer = new Timer(durationInput, startButton, pauseButton, {
 });
 
 const setStrokeDashArray = (selector) => {
-  const circleSVG = document.querySelector(selector);
-  const circleStyle = getComputedStyle(circleSVG);
-  const radius = parseFloat(circleStyle.r);
-  const calcPerimeter = 2 * Math.PI * radius - 1;
-  circleSVG.style.strokeDasharray = calcPerimeter;
+  const circleRadius = circle.getAttribute('r');
+  const perimeter = 2 * Math.PI * circleRadius;
+  circle.style.strokeDasharray = `${perimeter}px`;
 };
 
-const setStrokeDashoffset = (selector) => {
-  const circleSVG = document.querySelector(selector);
-  const circleStyle = getComputedStyle(circleSVG);
-  const offset = parseFloat(circleStyle.strokeDashoffset);
-  circleSVG.style.strokeDashoffset = offset;
+const setStrokeDashoffset = (selector, amount) => {
+  setStrokeDashArray(selector);
+  circle.style.strokeDashoffset = `-${amount}px`;
 };
+
+setStrokeDashArray();
